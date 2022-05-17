@@ -1,0 +1,145 @@
+---
+title: "WP-4-Projecting Data"
+author: "Afful Fosu"
+date: '(`r format(Sys.time(), "%B %d, %Y")`)'
+output: 
+  github_document: default
+  html_notebook: default 
+---
+
+## Introduction
+This notebook deals with 
+
+Working with projections st_transform()
+projecting points with  st_as-sf()
+saving geometric data with .geojson file 
+## Dependencies
+This notebook requires..
+
+```{r load-packages}
+# tidyverse packages
+library(dplyr)       # data wrangling
+library(readr)       # read csv files
+library(stringr)     # string tools
+library(ggplot2)       # static mapping
+
+# Special packages
+library(mapview)      # preview spatial data
+library(sf)           # spatial tools
+library(tidycensus)  # demographic data
+library(tigris)      # tiger/line data
+
+# Other packages
+library(here)        # file path management
+library(janitor)     # data wrangling
+library(naniar)      # missing data analyses
+library(viridis)      # viridis color palettes
+library(here)       # file path tools
+library(measurements)
+```
+
+## Load Data
+This notebook requires...
+
+```{r load-data 1}
+crime <- read_csv(here("data", "clean", "Crimes.csv"))
+```
+
+
+```{r load-data2}
+ STL_SBD<-st_read(here("data","St.Louis SBD" ,"SBD","SBD.shp"))
+```
+
+
+## Part 1
+## Data Cleaning Notes
+
+
+## Part 2
+
+
+homicide and removing all irrelevant records. 
+```{r p1-q1}
+filter(crimes_names, description %in% c("HOMICIDE")) -> homicides_unprojected
+
+#print tibble
+homicides_unprojected
+```
+
+
+homicide and removing all irrelevant records. 
+```{r p2-q2}
+filter(homicides_unprojected, x_coord != 0.0) -> homicides_clean
+
+#print tibble
+homicides_clean
+```
+
+
+## Project Data
+ 
+```{r project}
+homicides_sf <- st_as_sf(homicides_clean, coords = c("x_coord", "y_coord"), crs="ESRI:102696")
+```
+
+
+```{r preview}
+ mapview(homicides_sf)
+```
+
+## Transform Projection
+
+```{r convert-to-state-plane-m}
+homicides_statePlane <- st_transform(homicides_sf, crs = 4326)
+```
+
+
+
+```{r preview st}
+ mapview(homicides_statePlane)
+```
+
+check projection
+
+```{r check projection 1}
+ st_crs(homicides_statePlane)
+```
+
+Write geojson
+
+```{r p2-pp}
+st_write(STL_SBD, here("data","STL_SB.geojson"),delete_dsn= TRUE)
+```
+
+
+```{r p3-q3}
+st_write(homicides_statePlane, here("data","final", "homicides_final.geojson"),delete_dsn= TRUE)
+```
+
+
+```{r p4-q4}
+st_write(poverty_names, here("data","poverty_names.geojson"),delete_dsn= TRUE)
+```
+
+
+```{r p5-q5}
+st_write(race_names, here("data","race_names.geojson"), delete_dsn= TRUE)
+```
+
+
+```{r p6-q6}
+st_write(race_names, here("data","race_names.geojson"), delete_dsn = TRUE)
+```
+
+
+A description of the results.
+I have uploaded my two additional layers for my WP-4-Projecting data and have also clean these data save as jeoson file and into data for my mapping in ArcGIS Pro project.Moreover, my tabular data has been converted into  x and Y coordinates and geometric data already. Again the WGS 1984 coordinates system has been projected.
+
+
+
+
+
+
+
+
+
